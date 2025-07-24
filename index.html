@@ -151,9 +151,19 @@
             required: true
           }],
           data: { image_file: img_url, question_type: "confidence_rating" }
-        }
-      );
-    });
+        },
+    {
+      type: 'survey-likert',
+      questions: [{
+        prompt: "How emotionally aroused did the image make you feel?",
+        labels: ["Not at all emotionally aroused", "Slightly emotionally aroused", "Moderately emotionally aroused", "Very emotionally aroused", "Highly emotionally aroused"],
+        required: true
+      }],
+      data: { image_file: img_url, question_type: "arousal_rating" }
+    }
+);
+});
+
 
     timeline.push({
       type: 'html-button-response',
