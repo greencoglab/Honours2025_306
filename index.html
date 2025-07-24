@@ -102,7 +102,7 @@
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/9908_carcrash_c.jpg",
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/9921_burntwoman_c.jpg",
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/9940_911_c.JPG"
-    ];
+     ];
 
     timeline.push({
       type: 'preload',
@@ -140,12 +140,21 @@
             prompt: `<img src="${img_url}" class="test-image"><br><br>Compared to when you first saw this image, the camera distance is...`,
             labels: ["Much farther away", "Slightly farther", "The same", "Slightly closer", "Much closer"],
             required: true
-          }]
+          }],
+          data: { image_file: img_url, question_type: "distance_rating" }
+        },
+        {
+          type: 'survey-likert',
+          questions: [{
+            prompt: "How confident are you in your judgment?",
+            labels: ["0 - Did not see the image", "1 - Not sure", "2 - Pretty sure", "3 - Very sure"],
+            required: true
+          }],
+          data: { image_file: img_url, question_type: "confidence_rating" }
         }
       );
     });
 
-    // FINAL block — sends data to Qualtrics
     timeline.push({
       type: 'html-button-response',
       stimulus: `
@@ -157,7 +166,6 @@
         const data = jsPsych.data.get().values();
         console.log("Sending jsPsych data to Qualtrics:");
         console.log(data);
-
         window.parent.postMessage({
           type: "jspsych_complete",
           responses: data
@@ -165,7 +173,6 @@
       }
     });
 
-    //START jsPsych
     jsPsych.init({
       timeline: timeline,
       display_element: 'jspsych-target'
