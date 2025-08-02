@@ -63,7 +63,7 @@
     const preload_images = [
       "https://raw.githubusercontent.com/greencoglab/Honours-2025/main/img/fixation.png",
       "https://raw.githubusercontent.com/greencoglab/Honours-2025/main/img/mask.jpg",
-"https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/1050_snake_c.jpg",        
+      "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/1050_snake_c.jpg",        
 "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/1052_snake_c.jpg",
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/1201_spider_c.jpg",
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/1300_pitbull_c.jpg",
@@ -102,7 +102,7 @@
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/9908_carcrash_c.jpg",
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/9921_burntwoman_c.jpg",
   "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/9940_911_c.jpg"
-     ];
+    ];
 
     timeline.push({
       type: 'preload',
@@ -110,8 +110,8 @@
       message: '<p>Loading images…</p><p><strong>Please wait.</strong> The experiment will begin automatically.</p>'
     });
 
-    const fixation = "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/fixation.png";
-    const mask = "https://raw.githubusercontent.com/greencoglab/Honours2025_306/main/img/mask.jpg";
+    const fixation = "https://raw.githubusercontent.com/greencoglab/Honours-2025/main/img/fixation.png";
+    const mask = "https://raw.githubusercontent.com/greencoglab/Honours-2025/main/img/mask.jpg";
     const target_images = preload_images.filter(img => img.includes('_c.jpg'));
 
     target_images.forEach(img_url => {
@@ -140,42 +140,27 @@
             prompt: `<img src="${img_url}" class="test-image"><br><br>Compared to when you first saw this image, the camera distance is...`,
             labels: ["Much farther away", "Slightly farther", "The same", "Slightly closer", "Much closer"],
             required: true
-          }],
-          data: { image_file: img_url, question_type: "distance_rating" }
-        },
-        {
-          type: 'survey-likert',
-          questions: [{
-            prompt: "How confident are you in your judgment?",
-            labels: ["0 - Did not see the image", "1 - Not sure", "2 - Pretty sure", "3 - Very sure"],
-            required: true
-          }],
-          data: { image_file: img_url, question_type: "confidence_rating" }
-        },
-    {
-      type: 'survey-likert',
-      questions: [{
-        prompt: "How emotionally aroused did the image make you feel?",
-        labels: ["Not at all emotionally aroused", "Slightly emotionally aroused", "Moderately emotionally aroused", "Very emotionally aroused", "Highly emotionally aroused"],
-        required: true
-      }],
-      data: { image_file: img_url, question_type: "arousal_rating" }
-    }
-);
-});
+          }]
+        }
+      );
+    });
 
-
+    // FINAL block — sends data to Qualtrics
     timeline.push({
       type: 'html-button-response',
       stimulus: `
-         <h2>Thank you for completing that part of the experiment.</h2>
-        <p>Please press continue below</p>
+        <h2>Thank you for completing the experiment.</h2>
+        <p>Please wait while your data is recorded</p>
       `,
       choices: ['Continue'],
       on_finish: function () {
-        const data = jsPsych.data.get().values();
+        const data = jsPsych.data
+              .get()
+              .filter({ trial_type: 'survey-likert' })
+              .values();       
         console.log("Sending jsPsych data to Qualtrics:");
         console.log(data);
+
         window.parent.postMessage({
           type: "jspsych_complete",
           responses: data
@@ -183,6 +168,7 @@
       }
     });
 
+    //START jsPsych
     jsPsych.init({
       timeline: timeline,
       display_element: 'jspsych-target'
